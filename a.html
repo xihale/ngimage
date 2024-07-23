@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>nine-square grid segmentation for images</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f0f0f0;
+    }
+
+    #fileInput {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    #uploadContainer {
+      position: relative;
+      width: 95%;
+      height: 95%;
+      border: 8px dashed #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #uploadIcon {
+      width: 80%;
+      height: 80%;
+      cursor: pointer;
+      text-align: center;
+      font-size: 24px;
+      color: #333;
+    }
+
+    #uploadIcon svg {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <label for="fileInput" id="uploadContainer">
+    <div id="uploadIcon">
+      <svg t="1721694027657" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7618" width="168" height="168"><path d="M256 298.666667a85.333333 85.333333 0 1 1 85.333333 85.333333 85.333333 85.333333 0 0 1-85.333333-85.333333z m674.133333 415.146666l-256-341.333333a32.426667 32.426667 0 0 0-51.2 0l-170.666666 220.586667a21.333333 21.333333 0 0 1-33.28 0l-93.44-113.493334a32 32 0 0 0-49.92 0l-181.333334 234.24a42.666667 42.666667 0 0 0-8.96 26.026667v38.826667a32.426667 32.426667 0 0 0 32 32h789.333334a32.426667 32.426667 0 0 0 32-32v-39.253334a42.666667 42.666667 0 0 0-8.533334-25.6z" p-id="7619"></path></svg>
+    </div>
+  </label>
+  <input type="file" id="fileInput" accept="image/*" multiple>
+  <script>
+    document.getElementById('fileInput').addEventListener('change', handleFileSelect, false);
+
+    function handleFileSelect(evt) {
+      var files = evt.target.files;
+
+      for (var i = 0; i < files.length; i++) {
+        var reader = new FileReader();
+        var f = files[i];
+
+        reader.onload = (function(file) {
+          return function(e) {
+            var img = new Image();
+            img.onload = function() {
+              var canvas = document.createElement('canvas');
+              var ctx = canvas.getContext('2d');
+              canvas.width = img.width;
+              canvas.height = img.height;
+              ctx.drawImage(img, 0, 0);
+
+              var width = img.width / 3;
+              var height = img.height / 3;
+
+              // Draw white lines for grid
+              ctx.strokeStyle = 'white';
+              ctx.lineWidth = 2;
+              // Horizontal lines
+              for (var j = 1; j < 3; j++) {
+                ctx.beginPath();
+                ctx.moveTo(0, j * height);
+                ctx.lineTo(img.width, j * height);
+                ctx.stroke();
+              }
+              // Vertical lines
+              for (var k = 1; k < 3; k++) {
+                ctx.beginPath();
+                ctx.moveTo(k * width, 0);
+                ctx.lineTo(k * width, img.height);
+                ctx.stroke();
+              }
+
+              var processedImage = canvas.toDataURL();
+
+              var link = document.createElement('a');
+              link.href = processedImage;
+              link.download = '[ng]' + file.name;
+              link.click();
+            };
+            img.src = e.target.result;
+          };
+        })(f);
+
+        reader.readAsDataURL(f);
+      }
+    }
+  </script>
+</body>
+</html>
